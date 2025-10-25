@@ -1,5 +1,10 @@
 import Foundation
 
+// MARK: - HTTPMethod
+enum HTTPMethod: String {
+    case GET, POST, PUT, PATCH, DELETE
+}
+
 // MARK: - NetworkError
 enum NetworkError: Error, LocalizedError {
     case invalidURL
@@ -27,48 +32,133 @@ enum NetworkError: Error, LocalizedError {
 // MARK: - APIServicing
 protocol APIServicing {
     func fetchUsers(page: Int, results: Int, seed: String?) async throws -> RandomUserResponse
+    
+    // Generic request for future scalability
+    @discardableResult
+    func request<T: Decodable>(
+        _ type: T.Type,
+        path: String,
+        method: HTTPMethod,
+        urlParameters: [String: String]?,
+        headers: [String: String]?,
+        body: Data?
+    ) async throws -> T
+}
+
+// MARK: - Endpoint
+private struct Endpoint {
+    let baseURL: URL
+    let path: String
+    let method: HTTPMethod
+    let queryItems: [URLQueryItem]
+    let headers: [String: String]
+    let body: Data?
+    let cachePolicy: URLRequest.CachePolicy
+    let timeout: TimeInterval
+    
+    func makeRequest() throws -> URLRequest {
+        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
+            throw NetworkError.invalidURL
+        }
+        
+        // Build path safely
+        let basePath = components.path
+        let normalizedBase = basePath.hasSuffix("/") ? String(basePath.dropLast()) : basePath
+        let normalizedPath = path.hasPrefix("/") ? path : "/" + path
+        components.path = normalizedBase + normalizedPath
+        
+        // Query
+        components.queryItems = queryItems.isEmpty ? nil : queryItems
+        
+        guard let url = components.url else {
+            throw NetworkError.invalidURL
+        }
+        
+        var request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: timeout)
+        request.httpMethod = method.rawValue
+        request.httpBody = body
+        for (key, value) in headers {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+        return request
+    }
 }
 
 // MARK: - APIService
 final class APIService: APIServicing {
-    private let baseURL = "https://randomuser.me/api/"
+    private let baseURL: URL
     private let session: URLSession
+    private let decoder: JSONDecoder
+    private let defaultHeaders: [String: String]
+    private let defaultCachePolicy: URLRequest.CachePolicy
+    private let requestTimeout: TimeInterval
     
-    init(session: URLSession = {
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 60
-        return URLSession(configuration: configuration)
-    }()) {
+    init(
+        baseURL: URL = URL(string: "https://randomuser.me")!,
+        session: URLSession = {
+            let configuration = URLSessionConfiguration.default
+            configuration.timeoutIntervalForRequest = 30
+            configuration.timeoutIntervalForResource = 60
+            configuration.requestCachePolicy = .useProtocolCachePolicy
+            return URLSession(configuration: configuration)
+        }(),
+        decoder: JSONDecoder = JSONDecoder(),
+        defaultHeaders: [String: String] = [
+            "Accept": "application/json",
+            "Accept-Encoding": "gzip, deflate, br",
+            "User-Agent": "RandomUsersApp/1.0 (iOS)"
+        ],
+        defaultCachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
+        requestTimeout: TimeInterval = 30
+    ) {
+        self.baseURL = baseURL
         self.session = session
+        self.decoder = decoder
+        self.defaultHeaders = defaultHeaders
+        self.defaultCachePolicy = defaultCachePolicy
+        self.requestTimeout = requestTimeout
     }
     
-    // MARK: - Fetch Users
-    func fetchUsers(page: Int, results: Int = 25, seed: String? = nil) async throws -> RandomUserResponse {
-        var components = URLComponents(string: baseURL)
-        
-        var queryItems = [
-            URLQueryItem(name: "results", value: "\(results)"),
-            URLQueryItem(name: "page", value: "\(page)")
-        ]
-        
-        if let seed = seed {
-            queryItems.append(URLQueryItem(name: "seed", value: seed))
+    // MARK: - Public generic request
+    @discardableResult
+    func request<T: Decodable>(
+        _ type: T.Type,
+        path: String,
+        method: HTTPMethod = .GET,
+        urlParameters: [String: String]? = nil,
+        headers: [String: String]? = nil,
+        body: Data? = nil
+    ) async throws -> T {
+        // Merge headers (endpoint overrides defaults)
+        var mergedHeaders = defaultHeaders
+        if let headers {
+            for (k, v) in headers { mergedHeaders[k] = v }
         }
         
-        components?.queryItems = queryItems
+        // Map urlParameters to query items
+        let queryItems = (urlParameters ?? [:]).map { URLQueryItem(name: $0.key, value: $0.value) }
         
-        guard let url = components?.url else {
-            throw NetworkError.invalidURL
-        }
+        let endpoint = Endpoint(
+            baseURL: baseURL,
+            path: path,
+            method: method,
+            queryItems: queryItems,
+            headers: mergedHeaders,
+            body: body,
+            cachePolicy: defaultCachePolicy,
+            timeout: requestTimeout
+        )
         
-        print("🌐 Fetching users from: \(url.absoluteString)")
+        let request = try endpoint.makeRequest()
         
         do {
-            let (data, response) = try await session.data(from: url)
+            let (data, response) = try await session.data(for: request)
             
-            if let httpResponse = response as? HTTPURLResponse,
-               !(200...299).contains(httpResponse.statusCode) {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw NetworkError.networkError(URLError(.badServerResponse))
+            }
+            
+            guard (200...299).contains(httpResponse.statusCode) else {
                 throw NetworkError.httpError(httpResponse.statusCode)
             }
             
@@ -77,11 +167,8 @@ final class APIService: APIServicing {
             }
             
             do {
-                let randomUserResponse = try JSONDecoder().decode(RandomUserResponse.self, from: data)
-                print("✅ Successfully fetched \(randomUserResponse.results.count) users")
-                return randomUserResponse
+                return try decoder.decode(T.self, from: data)
             } catch {
-                print("❌ Decoding error: \(error)")
                 throw NetworkError.decodingError(error)
             }
         } catch {
@@ -92,5 +179,25 @@ final class APIService: APIServicing {
             }
         }
     }
+    
+    // MARK: - Fetch Users
+    func fetchUsers(page: Int, results: Int = 25, seed: String? = nil) async throws -> RandomUserResponse {
+        var params: [String: String] = [
+            "results": "\(results)",
+            "page": "\(page)"
+        ]
+        if let seed = seed {
+            params["seed"] = seed
+        }
+        
+        // randomuser path
+        return try await request(
+            RandomUserResponse.self,
+            path: "/api/",
+            method: .GET,
+            urlParameters: params,
+            headers: nil,
+            body: nil
+        )
+    }
 }
-
