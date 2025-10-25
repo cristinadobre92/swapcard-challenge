@@ -8,11 +8,13 @@ class UserDetailCoordinator: Coordinator {
     weak var delegate: UserDetailCoordinatorDelegate?
     var navigationController: UINavigationController
     
+    private let bookmarkManager: BookmarkManaging
     private let user: User
     
-    init(navigationController: UINavigationController, user: User) {
+    init(navigationController: UINavigationController, user: User, bookmarkManager: BookmarkManaging) {
         self.navigationController = navigationController
         self.user = user
+        self.bookmarkManager = bookmarkManager
     }
     
     func start() {
@@ -20,7 +22,10 @@ class UserDetailCoordinator: Coordinator {
     }
     
     private func showUserDetail() {
-        let userDetailVC = UserDetailViewController(user: user)
+        let userDetailVC = UserDetailViewController(
+            user: user,
+            bookmarkManager: bookmarkManager
+        )
         userDetailVC.coordinator = self
         navigationController.pushViewController(userDetailVC, animated: true)
     }

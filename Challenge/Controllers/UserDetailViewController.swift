@@ -67,8 +67,8 @@ class UserDetailViewController: UIViewController {
     }()
     
     // MARK: - Initialization
-    init(user: User) {
-        self.viewModel = UserDetailViewModel(user: user)
+    init(user: User, bookmarkManager: BookmarkManaging) {
+        self.viewModel = UserDetailViewModel(user: user, bookmarkManager: bookmarkManager)
         super.init(nibName: nil, bundle: nil)
     }
     

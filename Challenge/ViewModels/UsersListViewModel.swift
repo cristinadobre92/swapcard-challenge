@@ -8,6 +8,7 @@ protocol UsersListViewModelDelegate: AnyObject {
     func didFinishLoading()
 }
 
+@MainActor
 class UsersListViewModel {
     
     // MARK: - Properties
@@ -23,7 +24,13 @@ class UsersListViewModel {
     private var apiSeed: String?
     private var currentSearchText = ""
     
-    private let apiService = APIService.shared
+    private let apiService: APIServicing
+    private let bookmarkManager: BookmarkManaging
+    
+    init(bookmarkManager: BookmarkManaging, apiService: APIServicing) {
+        self.bookmarkManager = bookmarkManager
+        self.apiService = apiService
+    }
     
     // MARK: - Computed Properties
     var currentUsers: [User] {
@@ -40,21 +47,21 @@ class UsersListViewModel {
     
     // MARK: - Public Methods
     
-    /// Load initial users data
+    /// Load initial or next page of users
     func loadUsers() {
         guard !isLoading && hasMoreData else { return }
-        
         isLoading = true
         delegate?.didStartLoading()
         
-        apiService.fetchUsers(page: currentPage, seed: apiSeed) { [weak self] result in
-            guard let self = self else { return }
+        Task {
+            defer {
+                self.isLoading = false
+                self.delegate?.didFinishLoading()
+            }
             
-            self.isLoading = false
-            self.delegate?.didFinishLoading()
-            
-            switch result {
-            case .success(let response):
+            do {
+                let response = try await apiService.fetchUsers(page: currentPage, results: 25, seed: apiSeed)
+                
                 // Store seed for consistent pagination
                 if self.apiSeed == nil {
                     self.apiSeed = response.info.seed
@@ -79,9 +86,9 @@ class UsersListViewModel {
                 } else {
                     self.delegate?.didUpdateUsers()
                 }
-                
-            case .failure(let error):
-                self.delegate?.didReceiveError(error)
+            } catch {
+                let netErr = (error as? NetworkError) ?? .networkError(error)
+                self.delegate?.didReceiveError(netErr)
             }
         }
     }
@@ -147,13 +154,13 @@ class UsersListViewModel {
     /// Toggle bookmark for user at index
     func toggleBookmark(at index: Int) {
         guard let user = user(at: index) else { return }
-        BookmarkManager.shared.toggleBookmark(user)
+        bookmarkManager.toggleBookmark(user)
     }
     
     /// Check if user at index is bookmarked
     func isBookmarked(at index: Int) -> Bool {
         guard let user = user(at: index) else { return false }
-        return BookmarkManager.shared.isBookmarked(user)
+        return bookmarkManager.isBookmarked(user)
     }
 }
 
@@ -174,3 +181,4 @@ extension UsersListViewModel {
         return isLoading && users.isEmpty
     }
 }
+

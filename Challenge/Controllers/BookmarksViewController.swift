@@ -4,7 +4,7 @@ class BookmarksViewController: UIViewController {
     
     // MARK: - Properties
     weak var coordinator: BookmarksCoordinator?
-    private var viewModel = BookmarksViewModel()
+    private var viewModel: BookmarksViewModel
     
     // MARK: - UI Elements
     private let tableView: UITableView = {
@@ -50,6 +50,16 @@ class BookmarksViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    // MARK: - Init
+    init(bookmarkManager: BookmarkManaging) {
+        self.viewModel = BookmarksViewModel(bookmarkManager: bookmarkManager)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {

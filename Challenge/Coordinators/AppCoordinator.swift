@@ -10,7 +10,12 @@ class AppCoordinator: Coordinator {
     }
     
     func start() {
-        tabBarCoordinator = TabBarCoordinator()
+        // Create dependencies
+        let bookmarkManager: BookmarkManaging = BookmarkManager()
+        let apiService: APIServicing = APIService()
+        
+        // Inject into the TabBarCoordinator
+        tabBarCoordinator = TabBarCoordinator(bookmarkManager: bookmarkManager, apiService: apiService)
         
         window.rootViewController = tabBarCoordinator.tabBarController
         window.makeKeyAndVisible()
@@ -18,3 +23,4 @@ class AppCoordinator: Coordinator {
         tabBarCoordinator.start()
     }
 }
+

@@ -7,10 +7,14 @@ class TabBarCoordinator: NSObject, Coordinator {
     private var usersListCoordinator: UsersListCoordinator?
     private var bookmarksCoordinator: BookmarksCoordinator?
     
-    override init() {
+    private let bookmarkManager: BookmarkManaging
+    private let apiService: APIServicing
+    
+    init(bookmarkManager: BookmarkManaging, apiService: APIServicing) {
         self.navigationController = UINavigationController()
         self.tabBarController = UITabBarController()
-        super.init()
+        self.bookmarkManager = bookmarkManager
+        self.apiService = apiService
     }
     
     func start() {
@@ -36,7 +40,11 @@ class TabBarCoordinator: NSObject, Coordinator {
     private func setupCoordinators() {
         // Users List Coordinator
         let usersListNavController = UINavigationController()
-        usersListCoordinator = UsersListCoordinator(navigationController: usersListNavController)
+        usersListCoordinator = UsersListCoordinator(
+            navigationController: usersListNavController,
+            bookmarkManager: bookmarkManager,
+            apiService: apiService
+        )
 
         usersListNavController.tabBarItem = UITabBarItem(
             title: "Users",
@@ -46,7 +54,10 @@ class TabBarCoordinator: NSObject, Coordinator {
         
         // Bookmarks Coordinator
         let bookmarksNavController = UINavigationController()
-        bookmarksCoordinator = BookmarksCoordinator(navigationController: bookmarksNavController)
+        bookmarksCoordinator = BookmarksCoordinator(
+            navigationController: bookmarksNavController,
+            bookmarkManager: bookmarkManager
+        )
         
         bookmarksNavController.tabBarItem = UITabBarItem(
             title: "Bookmarks",
@@ -80,7 +91,7 @@ class TabBarCoordinator: NSObject, Coordinator {
     }
     
     private func updateBookmarkBadge() {
-        let bookmarkCount = BookmarkManager.shared.bookmarkedCount
+        let bookmarkCount = bookmarkManager.bookmarkedCount
         let bookmarkTab = tabBarController.viewControllers?[1]
         
         DispatchQueue.main.async {
@@ -96,3 +107,4 @@ class TabBarCoordinator: NSObject, Coordinator {
         NotificationCenter.default.removeObserver(self)
     }
 }
+

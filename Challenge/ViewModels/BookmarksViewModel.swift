@@ -11,7 +11,8 @@ class BookmarksViewModel {
     weak var delegate: BookmarksViewModelDelegate?
     
     private(set) var bookmarkedUsers: [User] = []
-    private let bookmarkManager = BookmarkManager.shared
+    
+    private let bookmarkManager: BookmarkManaging
     
     // MARK: - Computed Properties
     
@@ -31,7 +32,8 @@ class BookmarksViewModel {
     }
     
     // MARK: - Initialization
-    init() {
+    init(bookmarkManager: BookmarkManaging) {
+        self.bookmarkManager = bookmarkManager
         loadBookmarks()
     }
     
