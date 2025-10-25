@@ -47,7 +47,7 @@ class UsersListViewModel {
     
     // MARK: - Public Methods
     
-    /// Load initial or next page of users (async/await)
+    /// Load initial or next page of users
     func loadUsers() {
         guard !isLoading && hasMoreData else { return }
         isLoading = true

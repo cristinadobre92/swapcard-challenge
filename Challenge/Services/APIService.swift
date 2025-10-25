@@ -15,7 +15,7 @@ enum NetworkError: Error, LocalizedError {
         case .noData:
             return "No data received"
         case .decodingError(let error):
-                return "Failed to decode data: \(error.localizedDescription)"
+            return "Failed to decode data: \(error.localizedDescription)"
         case .networkError(let error):
             return "Network error: \(error.localizedDescription)"
         case .httpError(let statusCode):
@@ -43,7 +43,7 @@ final class APIService: APIServicing {
         self.session = session
     }
     
-    // MARK: - Fetch Users (async/await)
+    // MARK: - Fetch Users
     func fetchUsers(page: Int, results: Int = 25, seed: String? = nil) async throws -> RandomUserResponse {
         var components = URLComponents(string: baseURL)
         

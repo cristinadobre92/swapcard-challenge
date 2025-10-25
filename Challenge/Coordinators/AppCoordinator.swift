@@ -24,8 +24,3 @@ class AppCoordinator: Coordinator {
     }
 }
 
-extension AppCoordinator {
-    func assembleDependencyInjectionContainer() {
-    }
-}
-

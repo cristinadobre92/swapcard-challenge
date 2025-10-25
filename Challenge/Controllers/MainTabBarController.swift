@@ -13,8 +13,6 @@ class MainTabBarController: UITabBarController {
     }
     
     required init?(coder: NSCoder) {
-        // If you use storyboards, you could fall back to a shared instance here,
-        // but since you insisted on keeping this controller manually, we’ll crash to surface misuse.
         fatalError("init(coder:) has not been implemented")
     }
     
