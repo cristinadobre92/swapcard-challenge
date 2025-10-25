@@ -9,6 +9,7 @@ class UserTableViewCell: UITableViewCell {
     
     weak var delegate: UserTableViewCellDelegate?
     private var user: User?
+    private var avatarLoadTask: Task<Void, Never>?
     
     // MARK: - UI Elements
     private let avatarImageView: UIImageView = {
@@ -134,17 +135,25 @@ class UserTableViewCell: UITableViewCell {
     }
     
     private func loadAvatar(from urlString: String) {
+        avatarLoadTask?.cancel()
+        
         // Show placeholder with user initials while loading
         if let user = user {
             let firstInitial = user.name.first.first.map(String.init) ?? ""
             let lastInitial = user.name.last.first.map(String.init) ?? ""
             let initials = "\(firstInitial)\(lastInitial)"
             avatarImageView.image = UIImage.placeholder(initials: initials, size: CGSize(width: 60, height: 60))
+        } else {
+            avatarImageView.image = UIImage(systemName: "person.circle.fill")
         }
         
-        ImageLoadingService.shared.loadImage(from: urlString) { [weak self] (image: UIImage?) in
-            if let image = image {
-                self?.avatarImageView.image = image
+        avatarLoadTask = Task { [weak self] in
+            guard let self else { return }
+            if let image = await ImageLoadingService.shared.loadImage(from: urlString) {
+                // Ensure cell hasn't been reused for a different user
+                if !Task.isCancelled {
+                    self.avatarImageView.image = image
+                }
             }
         }
     }
@@ -168,6 +177,9 @@ class UserTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        avatarLoadTask?.cancel()
+        avatarLoadTask = nil
+        
         if let user = user {
             let firstInitial = user.name.first.first.map(String.init) ?? ""
             let lastInitial = user.name.last.first.map(String.init) ?? ""

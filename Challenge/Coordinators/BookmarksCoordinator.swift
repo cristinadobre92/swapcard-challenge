@@ -3,17 +3,22 @@ import UIKit
 class BookmarksCoordinator: Coordinator {
     var navigationController: UINavigationController
     private var userDetailCoordinator: UserDetailCoordinator?
+    private let bookmarkManager: BookmarkManaging
     
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, bookmarkManager: BookmarkManaging) {
         self.navigationController = navigationController
+        self.bookmarkManager = bookmarkManager
     }
+    
     
     func start() {
         showBookmarks()
     }
     
     private func showBookmarks() {
-        let bookmarksVC = BookmarksViewController()
+        let bookmarksVC = BookmarksViewController(
+            bookmarkManager: bookmarkManager
+        )
         bookmarksVC.coordinator = self
         navigationController.pushViewController(bookmarksVC, animated: false)
     }
@@ -21,7 +26,8 @@ class BookmarksCoordinator: Coordinator {
     func showUserDetail(for user: User) {
         userDetailCoordinator = UserDetailCoordinator(
             navigationController: navigationController,
-            user: user
+            user: user,
+            bookmarkManager: bookmarkManager
         )
         userDetailCoordinator?.delegate = self
         userDetailCoordinator?.start()

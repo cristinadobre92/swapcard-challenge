@@ -1,16 +1,31 @@
 import Foundation
 
+// Abstraction for dependency injection
+protocol BookmarkManaging {
+    var bookmarkedUsers: [User] { get }
+    func isBookmarked(_ user: User) -> Bool
+    func addBookmark(_ user: User)
+    func removeBookmark(_ user: User)
+    func toggleBookmark(_ user: User)
+    var bookmarkedCount: Int { get }
+    func clearAllBookmarks()
+}
+
 // MARK: - BookmarkManager
-class BookmarkManager {
-    static let shared = BookmarkManager()
+class BookmarkManager: BookmarkManaging {
     
-    private let userDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
     private let bookmarksKey = "BookmarkedUsers"
     
     // Notification for bookmark changes
     static let bookmarkDidChangeNotification = NSNotification.Name("BookmarkDidChange")
     
-    private init() {}
+    // Shared instance for transitional use (prefer injection)
+    static let shared = BookmarkManager()
+    
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+    }
     
     // MARK: - Public Methods
     

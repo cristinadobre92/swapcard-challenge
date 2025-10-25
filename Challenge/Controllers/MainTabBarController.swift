@@ -3,6 +3,20 @@ import UIKit
 class MainTabBarController: UITabBarController {
     
     private var bookmarkBadgeObserver: NSObjectProtocol?
+    private let bookmarkManager: BookmarkManaging
+    private let apiService: APIServicing
+    
+    init(bookmarkManager: BookmarkManaging, apiService: APIServicing) {
+        self.bookmarkManager = bookmarkManager
+        self.apiService = apiService
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        // If you use storyboards, you could fall back to a shared instance here,
+        // but since you insisted on keeping this controller manually, we’ll crash to surface misuse.
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,7 +34,10 @@ class MainTabBarController: UITabBarController {
     
     private func setupTabs() {
         // Users List Tab
-        let usersListVC = UsersListViewController()
+        let usersListVC = UsersListViewController(
+            bookmarkManager: bookmarkManager,
+            apiService: apiService
+        )
         let usersNav = UINavigationController(rootViewController: usersListVC)
         usersNav.tabBarItem = UITabBarItem(
             title: "Users",
@@ -29,7 +46,7 @@ class MainTabBarController: UITabBarController {
         )
         
         // Bookmarks Tab
-        let bookmarksVC = BookmarksViewController()
+        let bookmarksVC = BookmarksViewController(bookmarkManager: bookmarkManager)
         let bookmarksNav = UINavigationController(rootViewController: bookmarksVC)
         bookmarksNav.tabBarItem = UITabBarItem(
             title: "Bookmarks",
@@ -66,7 +83,7 @@ class MainTabBarController: UITabBarController {
     }
     
     private func updateBookmarkBadge() {
-        let bookmarkCount = BookmarkManager.shared.bookmarkedCount
+        let bookmarkCount = bookmarkManager.bookmarkedCount
         let bookmarkTab = viewControllers?[1]
         
         if bookmarkCount > 0 {

@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 // MARK: - Image Loading Service
-class ImageLoadingService {
+final class ImageLoadingService {
     static let shared = ImageLoadingService()
 
     private let cache = NSCache<NSString, UIImage>()
@@ -17,32 +17,26 @@ class ImageLoadingService {
         self.session = URLSession(configuration: configuration)
     }
 
-    func loadImage(from urlString: String, completion: @escaping (UIImage?) -> Void) {
+    // Async/await image loading with in-memory cache
+    func loadImage(from urlString: String) async -> UIImage? {
         let cacheKey = NSString(string: urlString)
 
-        // Check cache first
-        if let cachedImage = cache.object(forKey: cacheKey) {
-            completion(cachedImage)
-            return
+        // Return cached image if available
+        if let cached = cache.object(forKey: cacheKey) {
+            return cached
         }
 
         guard let url = URL(string: urlString) else {
-            completion(nil)
-            return
+            return nil
         }
 
-        session.dataTask(with: url) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                guard let data = data,
-                      let image = UIImage(data: data) else {
-                    completion(nil)
-                    return
-                }
-
-                // Cache the image
-                self?.cache.setObject(image, forKey: cacheKey)
-                completion(image)
-            }
-        }.resume()
+        do {
+            let (data, _) = try await session.data(from: url)
+            guard let image = UIImage(data: data) else { return nil }
+            cache.setObject(image, forKey: cacheKey)
+            return image
+        } catch {
+            return nil
+        }
     }
 }

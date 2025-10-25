@@ -6,6 +6,7 @@ protocol UserDetailViewModelDelegate: AnyObject {
     func didLoadProfileImage(_ image: UIImage)
 }
 
+@MainActor
 class UserDetailViewModel {
     
     // MARK: - Properties
@@ -13,11 +14,12 @@ class UserDetailViewModel {
     
     private(set) var user: User
     private let imageLoadingService = ImageLoadingService.shared
-    private let bookmarkManager = BookmarkManager.shared
+    private let bookmarkManager: BookmarkManaging
     
     // MARK: - Initialization
-    init(user: User) {
+    init(user: User, bookmarkManager: BookmarkManaging) {
         self.user = user
+        self.bookmarkManager = bookmarkManager
         setupNotifications()
     }
     
@@ -59,11 +61,12 @@ class UserDetailViewModel {
         return UIImage.placeholder(initials: initials, size: CGSize(width: 150, height: 150))
     }
     
-    /// Load profile image
+    /// Load profile image using async/await
     func loadProfileImage() {
-        imageLoadingService.loadImage(from: user.picture.large) { [weak self] image in
-            if let image = image {
-                self?.delegate?.didLoadProfileImage(image)
+        Task { [weak self] in
+            guard let self else { return }
+            if let image = await imageLoadingService.loadImage(from: user.picture.large) {
+                delegate?.didLoadProfileImage(image)
             }
         }
     }

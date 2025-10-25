@@ -15,7 +15,7 @@ enum NetworkError: Error, LocalizedError {
         case .noData:
             return "No data received"
         case .decodingError(let error):
-            return "Failed to decode data: \(error.localizedDescription)"
+                return "Failed to decode data: \(error.localizedDescription)"
         case .networkError(let error):
             return "Network error: \(error.localizedDescription)"
         case .httpError(let statusCode):
@@ -24,22 +24,27 @@ enum NetworkError: Error, LocalizedError {
     }
 }
 
+// MARK: - APIServicing
+protocol APIServicing {
+    func fetchUsers(page: Int, results: Int, seed: String?) async throws -> RandomUserResponse
+}
+
 // MARK: - APIService
-class APIService {
-    static let shared = APIService()
-    
+final class APIService: APIServicing {
     private let baseURL = "https://randomuser.me/api/"
     private let session: URLSession
     
-    private init() {
+    init(session: URLSession = {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 60
-        self.session = URLSession(configuration: configuration)
+        return URLSession(configuration: configuration)
+    }()) {
+        self.session = session
     }
     
-    // MARK: - Fetch Users
-    func fetchUsers(page: Int, results: Int = 25, seed: String? = nil, completion: @escaping (Result<RandomUserResponse, NetworkError>) -> Void) {
+    // MARK: - Fetch Users (async/await)
+    func fetchUsers(page: Int, results: Int = 25, seed: String? = nil) async throws -> RandomUserResponse {
         var components = URLComponents(string: baseURL)
         
         var queryItems = [
@@ -47,7 +52,6 @@ class APIService {
             URLQueryItem(name: "page", value: "\(page)")
         ]
         
-        // Use seed for consistent pagination
         if let seed = seed {
             queryItems.append(URLQueryItem(name: "seed", value: seed))
         }
@@ -55,39 +59,38 @@ class APIService {
         components?.queryItems = queryItems
         
         guard let url = components?.url else {
-            completion(.failure(.invalidURL))
-            return
+            throw NetworkError.invalidURL
         }
         
         print("🌐 Fetching users from: \(url.absoluteString)")
         
-        session.dataTask(with: url) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    completion(.failure(.networkError(error)))
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse,
-                   !(200...299).contains(httpResponse.statusCode) {
-                    completion(.failure(.httpError(httpResponse.statusCode)))
-                    return
-                }
-                
-                guard let data = data else {
-                    completion(.failure(.noData))
-                    return
-                }
-                
-                do {
-                    let randomUserResponse = try JSONDecoder().decode(RandomUserResponse.self, from: data)
-                    print("✅ Successfully fetched \(randomUserResponse.results.count) users")
-                    completion(.success(randomUserResponse))
-                } catch {
-                    print("❌ Decoding error: \(error)")
-                    completion(.failure(.decodingError(error)))
-                }
+        do {
+            let (data, response) = try await session.data(from: url)
+            
+            if let httpResponse = response as? HTTPURLResponse,
+               !(200...299).contains(httpResponse.statusCode) {
+                throw NetworkError.httpError(httpResponse.statusCode)
             }
-        }.resume()
+            
+            guard !data.isEmpty else {
+                throw NetworkError.noData
+            }
+            
+            do {
+                let randomUserResponse = try JSONDecoder().decode(RandomUserResponse.self, from: data)
+                print("✅ Successfully fetched \(randomUserResponse.results.count) users")
+                return randomUserResponse
+            } catch {
+                print("❌ Decoding error: \(error)")
+                throw NetworkError.decodingError(error)
+            }
+        } catch {
+            if let netErr = error as? NetworkError {
+                throw netErr
+            } else {
+                throw NetworkError.networkError(error)
+            }
+        }
     }
 }
+
