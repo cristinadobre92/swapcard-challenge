@@ -11,7 +11,7 @@ concurrency:
   group: swift-ci-${{ github.ref }}
   cancel-in-progress: true
 
-jjobs:
+jobs:
   build:
     runs-on: macos-latest
     strategy:
