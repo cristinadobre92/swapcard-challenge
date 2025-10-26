@@ -1,4 +1,5 @@
 import Foundation
+import SharedModelsKit
 
 // Abstraction for dependency injection
 protocol BookmarkManaging {

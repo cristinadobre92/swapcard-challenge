@@ -1,4 +1,5 @@
 import UIKit
+import APIServiceKit
 
 class TabBarCoordinator: NSObject, Coordinator {
     var navigationController: UINavigationController

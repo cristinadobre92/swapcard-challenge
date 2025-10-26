@@ -1,4 +1,5 @@
 import UIKit
+import APIServiceKit
 
 class AppCoordinator: Coordinator {
     var tabBarCoordinator: TabBarCoordinator!

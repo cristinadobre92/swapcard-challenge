@@ -1,4 +1,5 @@
 import UIKit
+import SharedModelsKit
 
 protocol UserDetailCoordinatorDelegate: AnyObject {
     func userDetailCoordinatorDidFinish(_ coordinator: UserDetailCoordinator)

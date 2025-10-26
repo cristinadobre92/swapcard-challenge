@@ -1,4 +1,5 @@
 import UIKit
+import SharedModelsKit
 
 protocol UserTableViewCellDelegate: AnyObject {
     func didTapBookmark(for user: User)
