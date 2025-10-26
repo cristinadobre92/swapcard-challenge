@@ -1,12 +1,14 @@
 import UIKit
 import APIServiceKit
 import SharedModelsKit
+import BookmarksKit
 
 class UsersListViewController: UIViewController {
     
     // MARK: - Properties
     weak var coordinator: UsersListCoordinator?
     private var viewModel: UsersListViewModel
+    private let bookmarkManager: BookmarkManaging
     
     // MARK: - UI Elements
     private let tableView: UITableView = {
@@ -57,6 +59,7 @@ class UsersListViewController: UIViewController {
     
     // MARK: - Init
     init(bookmarkManager: BookmarkManaging, apiService: APIServicing) {
+        self.bookmarkManager = bookmarkManager
         self.viewModel = UsersListViewModel(bookmarkManager: bookmarkManager, apiService: apiService)
         super.init(nibName: nil, bundle: nil)
     }
@@ -178,7 +181,7 @@ class UsersListViewController: UIViewController {
                   let indexPath = tableView.indexPath(for: cell),
                   let user = viewModel.user(at: indexPath.row) else { continue }
             
-            userCell.configure(with: user)
+            userCell.configure(with: user, bookmarkManager: bookmarkManager)
         }
     }
     
@@ -212,7 +215,7 @@ extension UsersListViewController: UITableViewDataSource {
         }
         
         if let user = viewModel.user(at: indexPath.row) {
-            cell.configure(with: user)
+            cell.configure(with: user, bookmarkManager: bookmarkManager)
             cell.delegate = self
         }
         
@@ -296,4 +299,3 @@ extension UsersListViewController: UsersListViewModelDelegate {
         }
     }
 }
-

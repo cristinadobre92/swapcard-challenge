@@ -1,5 +1,6 @@
 import UIKit
 import SharedModelsKit
+import BookmarksKit
 
 class BookmarksCoordinator: Coordinator {
     var navigationController: UINavigationController

@@ -1,5 +1,6 @@
 import UIKit
 import SharedModelsKit
+import BookmarksKit
 
 class UserDetailViewController: UIViewController {
     

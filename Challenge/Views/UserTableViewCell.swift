@@ -1,5 +1,6 @@
 import UIKit
 import SharedModelsKit
+import BookmarksKit
 
 protocol UserTableViewCellDelegate: AnyObject {
     func didTapBookmark(for user: User)
@@ -11,6 +12,7 @@ class UserTableViewCell: UITableViewCell {
     weak var delegate: UserTableViewCellDelegate?
     private var user: User?
     private var avatarLoadTask: Task<Void, Never>?
+    private var bookmarkManager: BookmarkManaging?
     
     // MARK: - UI Elements
     private let avatarImageView: UIImageView = {
@@ -121,15 +123,16 @@ class UserTableViewCell: UITableViewCell {
     }
     
     // MARK: - Configuration
-    func configure(with user: User) {
+    func configure(with user: User, bookmarkManager: BookmarkManaging) {
         self.user = user
+        self.bookmarkManager = bookmarkManager
         
         nameLabel.text = user.fullName
         emailLabel.text = user.email
         locationLabel.text = "\(user.location.city), \(user.location.country)"
         
         // Update bookmark button state
-        bookmarkButton.isSelected = BookmarkManager.shared.isBookmarked(user)
+        bookmarkButton.isSelected = bookmarkManager.isBookmarked(user)
         
         // Load avatar image
         loadAvatar(from: user.picture.thumbnail)
@@ -164,7 +167,11 @@ class UserTableViewCell: UITableViewCell {
         delegate?.didTapBookmark(for: user)
         
         // Update button state immediately for better UX
-        bookmarkButton.isSelected = BookmarkManager.shared.isBookmarked(user)
+        if let bookmarkManager {
+            bookmarkButton.isSelected = bookmarkManager.isBookmarked(user)
+        } else {
+            bookmarkButton.isSelected = false
+        }
         
         // Add a little animation
         UIView.animate(withDuration: 0.1, animations: {
@@ -194,5 +201,6 @@ class UserTableViewCell: UITableViewCell {
         locationLabel.text = nil
         bookmarkButton.isSelected = false
         user = nil
+        bookmarkManager = nil
     }
 }

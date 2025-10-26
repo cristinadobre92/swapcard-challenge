@@ -8,7 +8,7 @@ let package = Package(
     platforms: [.iOS(.v18)],
     products: [
         .singleTargetLibrary("APIServiceKit"),
-        .singleTargetLibrary("UtilityKit"),
+        .singleTargetLibrary("BookmarksKit"),
         .singleTargetLibrary("SharedModelsKit")
     ],
     targets: [
@@ -19,8 +19,10 @@ let package = Package(
             ]
         ),
         .projectTarget(
-            name: "UtilityKit",
-            dependencies: []
+            name: "BookmarksKit",
+            dependencies: [
+                "SharedModelsKit"
+            ]
         ),
         .projectTarget(
             name: "SharedModelsKit",

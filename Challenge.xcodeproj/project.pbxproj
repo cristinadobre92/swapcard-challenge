@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6519B6892EAE2A350059E4DD /* BookmarksKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6519B6882EAE2A350059E4DD /* BookmarksKit */; };
 		655086272EAD3AD900D63478 /* BookmarkFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 655086262EAD3AD900D63478 /* BookmarkFeature */; };
 		655086292EAD3AD900D63478 /* UserDetailFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 655086282EAD3AD900D63478 /* UserDetailFeature */; };
 		6550862B2EAD3AD900D63478 /* UsersListFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 6550862A2EAD3AD900D63478 /* UsersListFeature */; };
-		655086582EAD402100D63478 /* UtilityKit in Frameworks */ = {isa = PBXBuildFile; productRef = 655086572EAD402100D63478 /* UtilityKit */; };
 		6550865A2EAD40E100D63478 /* APIServiceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 655086592EAD40E100D63478 /* APIServiceKit */; };
 		6550865C2EAD40E100D63478 /* SharedModelsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6550865B2EAD40E100D63478 /* SharedModelsKit */; };
 /* End PBXBuildFile section */
@@ -47,8 +47,8 @@
 			files = (
 				6550865C2EAD40E100D63478 /* SharedModelsKit in Frameworks */,
 				655086272EAD3AD900D63478 /* BookmarkFeature in Frameworks */,
-				655086582EAD402100D63478 /* UtilityKit in Frameworks */,
 				6550865A2EAD40E100D63478 /* APIServiceKit in Frameworks */,
+				6519B6892EAE2A350059E4DD /* BookmarksKit in Frameworks */,
 				6550862B2EAD3AD900D63478 /* UsersListFeature in Frameworks */,
 				655086292EAD3AD900D63478 /* UserDetailFeature in Frameworks */,
 			);
@@ -107,6 +107,7 @@
 				655086572EAD402100D63478 /* UtilityKit */,
 				655086592EAD40E100D63478 /* APIServiceKit */,
 				6550865B2EAD40E100D63478 /* SharedModelsKit */,
+				6519B6882EAE2A350059E4DD /* BookmarksKit */,
 			);
 			productName = Challenge;
 			productReference = ED36A9CF2E9FF45D00D355C1 /* Challenge.app */;
@@ -362,6 +363,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6519B6882EAE2A350059E4DD /* BookmarksKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BookmarksKit;
+		};
 		655086262EAD3AD900D63478 /* BookmarkFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BookmarkFeature;

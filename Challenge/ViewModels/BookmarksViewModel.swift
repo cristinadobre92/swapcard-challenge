@@ -1,5 +1,6 @@
 import Foundation
 import SharedModelsKit
+import BookmarksKit
 
 protocol BookmarksViewModelDelegate: AnyObject {
     func didUpdateBookmarks()

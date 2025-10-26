@@ -1,5 +1,6 @@
 import UIKit
 import APIServiceKit
+import BookmarksKit
 
 class TabBarCoordinator: NSObject, Coordinator {
     var navigationController: UINavigationController

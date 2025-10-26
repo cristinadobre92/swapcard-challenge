@@ -1,6 +1,7 @@
 import UIKit
 import APIServiceKit
 import SharedModelsKit
+import BookmarksKit
 
 class UsersListCoordinator: Coordinator {
     var navigationController: UINavigationController

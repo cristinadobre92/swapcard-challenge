@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import SharedModelsKit
+import BookmarksKit
 
 protocol UserDetailViewModelDelegate: AnyObject {
     func didUpdateBookmarkStatus()

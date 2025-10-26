@@ -11,21 +11,30 @@ let package = Package(
         .singleTargetLibrary("UsersListFeature"),
         .singleTargetLibrary("UserDetailFeature")
     ],
-//    dependencies: [
-//        .package(path: "../Kits")
-//    ],
+    dependencies: [
+        .package(path: "../Kits")
+    ],
     targets: [
         .projectTarget(
             name: "BookmarkFeature",
-            dependencies: []
+            dependencies: [
+                .kit("APIServiceKit"),
+                .kit("SharedModelsKit")
+            ]
         ),
         .projectTarget(
             name: "UsersListFeature",
-            dependencies: []
+            dependencies: [
+                .kit("APIServiceKit"),
+                .kit("SharedModelsKit")
+            ]
         ),
         .projectTarget(
             name: "UserDetailFeature",
-            dependencies: []
+            dependencies: [
+                .kit("APIServiceKit"),
+                .kit("SharedModelsKit")
+            ]
         )
     ]
 )

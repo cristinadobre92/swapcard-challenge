@@ -1,5 +1,6 @@
 import UIKit
 import APIServiceKit
+import BookmarksKit
 
 class AppCoordinator: Coordinator {
     var tabBarCoordinator: TabBarCoordinator!
