@@ -3,6 +3,7 @@ import SharedModelsKit
 import BookmarksKit
 import DesignKit
 
+@MainActor
 class BookmarksViewController: UIViewController {
     
     // MARK: - Properties
@@ -176,16 +177,14 @@ class BookmarksViewController: UIViewController {
     
     // MARK: - UI Updates
     private func updateUI() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-            self.emptyStateView.isHidden = !self.viewModel.isEmpty
-            self.updateNavigationItems()
-            
-            let emptyState = self.viewModel.getEmptyStateConfiguration()
-            self.emptyStateImageView.image = UIImage(systemName: emptyState.imageName)
-            self.emptyStateLabel.text = emptyState.title
-            self.emptyStateSubLabel.text = emptyState.subtitle
-        }
+        tableView.reloadData()
+        emptyStateView.isHidden = !viewModel.isEmpty
+        updateNavigationItems()
+        
+        let emptyState = viewModel.getEmptyStateConfiguration()
+        emptyStateImageView.image = UIImage(systemName: emptyState.imageName)
+        emptyStateLabel.text = emptyState.title
+        emptyStateSubLabel.text = emptyState.subtitle
     }
     
     // MARK: - Actions
@@ -205,10 +204,8 @@ class BookmarksViewController: UIViewController {
     }
     
     @objc private func bookmarkDidChange(_ notification: Notification) {
-        DispatchQueue.main.async {
-            // Reload bookmarks data and update UI
-            self.viewModel.loadBookmarks()
-        }
+        // Reload bookmarks data and update UI
+        viewModel.loadBookmarks()
     }
     
     // MARK: - Navigation
@@ -275,8 +272,7 @@ extension BookmarksViewController: BookmarksViewModelDelegate {
     }
     
     func didReceiveError(_ message: String) {
-        DispatchQueue.main.async {
-            self.showAlert(title: "Error", message: message)
-        }
+        self.showAlert(title: "Error", message: message)
     }
 }
+

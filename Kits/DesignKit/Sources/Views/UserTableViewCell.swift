@@ -2,10 +2,12 @@ import UIKit
 import SharedModelsKit
 import BookmarksKit
 
+@MainActor
 public protocol UserTableViewCellDelegate: AnyObject {
     func didTapBookmark(for user: User)
 }
 
+@MainActor
 public final class UserTableViewCell: UITableViewCell {
     public static let identifier = "UserTableViewCell"
     
@@ -216,3 +218,4 @@ public final class UserTableViewCell: UITableViewCell {
         imageLoading = nil
     }
 }
+

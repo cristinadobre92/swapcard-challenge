@@ -3,6 +3,7 @@ import APIServiceKit
 import BookmarksKit
 import DesignKit
 
+@MainActor
 class TabBarCoordinator: NSObject, Coordinator {
     var navigationController: UINavigationController
     
@@ -101,12 +102,10 @@ class TabBarCoordinator: NSObject, Coordinator {
         let bookmarkCount = bookmarkManager.bookmarkedCount
         let bookmarkTab = tabBarController.viewControllers?[1]
         
-        DispatchQueue.main.async {
-            if bookmarkCount > 0 {
-                bookmarkTab?.tabBarItem.badgeValue = "\(bookmarkCount)"
-            } else {
-                bookmarkTab?.tabBarItem.badgeValue = nil
-            }
+        if bookmarkCount > 0 {
+            bookmarkTab?.tabBarItem.badgeValue = "\(bookmarkCount)"
+        } else {
+            bookmarkTab?.tabBarItem.badgeValue = nil
         }
     }
     

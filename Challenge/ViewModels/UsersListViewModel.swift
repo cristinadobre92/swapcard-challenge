@@ -3,6 +3,7 @@ import APIServiceKit
 import SharedModelsKit
 import BookmarksKit
 
+@MainActor
 protocol UsersListViewModelDelegate: AnyObject {
     func didUpdateUsers()
     func didUpdateSearchResults()

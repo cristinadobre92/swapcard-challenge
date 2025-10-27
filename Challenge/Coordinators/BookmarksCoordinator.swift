@@ -3,6 +3,7 @@ import SharedModelsKit
 import BookmarksKit
 import DesignKit
 
+@MainActor
 class BookmarksCoordinator: Coordinator {
     var navigationController: UINavigationController
     private var userDetailCoordinator: UserDetailCoordinator?
@@ -47,3 +48,4 @@ extension BookmarksCoordinator: UserDetailCoordinatorDelegate {
         userDetailCoordinator = nil
     }
 }
+
