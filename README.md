@@ -15,17 +15,19 @@ Challenge/
 
 ## 🚀 Run Instructions
 
-# Clone the repository
+```
+Clone the repository
 git clone https://github.com/cristinadobre92/swapcard-challenge.git
 
-# Navigate to the project directory
+Navigate to the project directory
 cd swapcard-challenge
 
-# Open the workspace in Xcode
+Open the workspace in Xcode
 open Challenge.xcworkspace
 
-# Select an iOS Simulator
-# Press Run (⌘ + R)
+Select an iOS Simulator
+Press Run (⌘ + R)
+```
 
 ## 🧱 Architecture Notes
 
