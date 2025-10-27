@@ -106,7 +106,6 @@
 				655086262EAD3AD900D63478 /* BookmarkFeature */,
 				655086282EAD3AD900D63478 /* UserDetailFeature */,
 				6550862A2EAD3AD900D63478 /* UsersListFeature */,
-				655086572EAD402100D63478 /* UtilityKit */,
 				655086592EAD40E100D63478 /* APIServiceKit */,
 				6550865B2EAD40E100D63478 /* SharedModelsKit */,
 				6519B6882EAE2A350059E4DD /* BookmarksKit */,
@@ -385,10 +384,6 @@
 		6550862A2EAD3AD900D63478 /* UsersListFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = UsersListFeature;
-		};
-		655086572EAD402100D63478 /* UtilityKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UtilityKit;
 		};
 		655086592EAD40E100D63478 /* APIServiceKit */ = {
 			isa = XCSwiftPackageProductDependency;
