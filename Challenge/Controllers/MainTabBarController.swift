@@ -1,14 +1,19 @@
 import UIKit
+import APIServiceKit
+import BookmarksKit
+import DesignKit
 
 class MainTabBarController: UITabBarController {
     
     private var bookmarkBadgeObserver: NSObjectProtocol?
     private let bookmarkManager: BookmarkManaging
     private let apiService: APIServicing
+    private let imageLoader: ImageLoading
     
-    init(bookmarkManager: BookmarkManaging, apiService: APIServicing) {
+    init(bookmarkManager: BookmarkManaging, apiService: APIServicing, imageLoader: ImageLoading) {
         self.bookmarkManager = bookmarkManager
         self.apiService = apiService
+        self.imageLoader = imageLoader
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -34,7 +39,8 @@ class MainTabBarController: UITabBarController {
         // Users List Tab
         let usersListVC = UsersListViewController(
             bookmarkManager: bookmarkManager,
-            apiService: apiService
+            apiService: apiService,
+            imageLoader: imageLoader
         )
         let usersNav = UINavigationController(rootViewController: usersListVC)
         usersNav.tabBarItem = UITabBarItem(
@@ -44,7 +50,10 @@ class MainTabBarController: UITabBarController {
         )
         
         // Bookmarks Tab
-        let bookmarksVC = BookmarksViewController(bookmarkManager: bookmarkManager)
+        let bookmarksVC = BookmarksViewController(
+            bookmarkManager: bookmarkManager,
+            imageLoader: imageLoader
+        )
         let bookmarksNav = UINavigationController(rootViewController: bookmarksVC)
         bookmarksNav.tabBarItem = UITabBarItem(
             title: "Bookmarks",

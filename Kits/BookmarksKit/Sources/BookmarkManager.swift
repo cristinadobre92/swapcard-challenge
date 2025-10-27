@@ -1,7 +1,8 @@
 import Foundation
+import SharedModelsKit
 
 // Abstraction for dependency injection
-protocol BookmarkManaging {
+public protocol BookmarkManaging {
     var bookmarkedUsers: [User] { get }
     func isBookmarked(_ user: User) -> Bool
     func addBookmark(_ user: User)
@@ -12,25 +13,22 @@ protocol BookmarkManaging {
 }
 
 // MARK: - BookmarkManager
-class BookmarkManager: BookmarkManaging {
+public final class BookmarkManager: BookmarkManaging {
     
     private let userDefaults: UserDefaults
     private let bookmarksKey = "BookmarkedUsers"
     
     // Notification for bookmark changes
-    static let bookmarkDidChangeNotification = NSNotification.Name("BookmarkDidChange")
+    public static let bookmarkDidChangeNotification = NSNotification.Name("BookmarkDidChange")
     
-    // Shared instance for transitional use (prefer injection)
-    static let shared = BookmarkManager()
-    
-    init(userDefaults: UserDefaults = .standard) {
+    public init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
     
     // MARK: - Public Methods
     
     /// Get all bookmarked users
-    var bookmarkedUsers: [User] {
+    public var bookmarkedUsers: [User] {
         guard let data = userDefaults.data(forKey: bookmarksKey),
               let users = try? JSONDecoder().decode([User].self, from: data) else {
             return []
@@ -39,12 +37,12 @@ class BookmarkManager: BookmarkManaging {
     }
     
     /// Check if a user is bookmarked
-    func isBookmarked(_ user: User) -> Bool {
+    public func isBookmarked(_ user: User) -> Bool {
         return bookmarkedUsers.contains(where: { $0.uniqueID == user.uniqueID })
     }
     
     /// Add a user to bookmarks
-    func addBookmark(_ user: User) {
+    public func addBookmark(_ user: User) {
         var currentBookmarks = bookmarkedUsers
         
         // Avoid duplicates
@@ -62,7 +60,7 @@ class BookmarkManager: BookmarkManaging {
     }
     
     /// Remove a user from bookmarks
-    func removeBookmark(_ user: User) {
+    public func removeBookmark(_ user: User) {
         var currentBookmarks = bookmarkedUsers
         currentBookmarks.removeAll { $0.uniqueID == user.uniqueID }
         saveBookmarks(currentBookmarks)
@@ -76,7 +74,7 @@ class BookmarkManager: BookmarkManaging {
     }
     
     /// Toggle bookmark status for a user
-    func toggleBookmark(_ user: User) {
+    public func toggleBookmark(_ user: User) {
         if isBookmarked(user) {
             removeBookmark(user)
         } else {
@@ -85,12 +83,12 @@ class BookmarkManager: BookmarkManaging {
     }
     
     /// Get count of bookmarked users
-    var bookmarkedCount: Int {
+    public var bookmarkedCount: Int {
         return bookmarkedUsers.count
     }
     
     /// Clear all bookmarks
-    func clearAllBookmarks() {
+    public func clearAllBookmarks() {
         userDefaults.removeObject(forKey: bookmarksKey)
         
         print("🗑️ Cleared all bookmarks")

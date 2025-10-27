@@ -1,0 +1,68 @@
+// swift-tools-version: 6.2
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+
+import PackageDescription
+
+let package = Package(
+    name: "Kits",
+    platforms: [.iOS(.v18)],
+    products: [
+        .singleTargetLibrary("APIServiceKit"),
+        .singleTargetLibrary("BookmarksKit"),
+        .singleTargetLibrary("SharedModelsKit"),
+        .singleTargetLibrary("DesignKit")
+    ],
+    targets: [
+        .projectTarget(
+            name: "APIServiceKit",
+            dependencies: [
+                "SharedModelsKit"
+            ]
+        ),
+        .projectTarget(
+            name: "BookmarksKit",
+            dependencies: [
+                "SharedModelsKit"
+            ]
+        ),
+        .projectTarget(
+            name: "SharedModelsKit",
+            dependencies: []
+        ),
+        .projectTarget(
+            name: "DesignKit",
+            dependencies: [
+                "SharedModelsKit",
+                "BookmarksKit"
+            ]
+        )
+    ]
+)
+
+
+// MARK: - Helpers
+
+extension Product {
+    static func singleTargetLibrary(_ name: String) -> Product {
+        .library(name: name, targets: [name])
+    }
+}
+
+extension Target {
+    static func projectTarget(
+        name: String,
+        dependencies: [Target.Dependency] = []
+    ) -> Target {
+        return Target.target(
+            name: name,
+            dependencies: dependencies,
+            path: "\(name)/Sources"
+        )
+    }
+}
+
+extension Target.Dependency {
+    static func kit(_ name: String) -> Target.Dependency {
+        .product(name: name, package: "Kits")
+    }
+}

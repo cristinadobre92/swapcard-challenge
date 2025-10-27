@@ -1,10 +1,15 @@
 import UIKit
+import SharedModelsKit
+import BookmarksKit
+import DesignKit
 
 class BookmarksViewController: UIViewController {
     
     // MARK: - Properties
     weak var coordinator: BookmarksCoordinator?
     private var viewModel: BookmarksViewModel
+    private let bookmarkManager: BookmarkManaging
+    private let imageLoader: ImageLoading
     
     // MARK: - UI Elements
     private let tableView: UITableView = {
@@ -52,7 +57,9 @@ class BookmarksViewController: UIViewController {
     }()
     
     // MARK: - Init
-    init(bookmarkManager: BookmarkManaging) {
+    init(bookmarkManager: BookmarkManaging, imageLoader: ImageLoading) {
+        self.bookmarkManager = bookmarkManager
+        self.imageLoader = imageLoader
         self.viewModel = BookmarksViewModel(bookmarkManager: bookmarkManager)
         super.init(nibName: nil, bundle: nil)
     }
@@ -224,7 +231,12 @@ extension BookmarksViewController: UITableViewDataSource {
         }
         
         if let user = viewModel.user(at: indexPath.row) {
-            cell.configure(with: user)
+            cell
+                .configure(
+                    with: user,
+                    bookmarkManager: bookmarkManager,
+                    imageLoader: imageLoader
+                )
             cell.delegate = self
         }
         

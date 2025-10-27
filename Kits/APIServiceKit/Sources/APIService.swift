@@ -1,4 +1,5 @@
 import Foundation
+import SharedModelsKit
 
 // MARK: - HTTPMethod
 enum HTTPMethod: String {
@@ -6,14 +7,14 @@ enum HTTPMethod: String {
 }
 
 // MARK: - NetworkError
-enum NetworkError: Error, LocalizedError {
+public enum NetworkError: Error, LocalizedError {
     case invalidURL
     case noData
     case decodingError(Error)
     case networkError(Error)
     case httpError(Int)
     
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .invalidURL:
             return "Invalid URL"
@@ -30,19 +31,8 @@ enum NetworkError: Error, LocalizedError {
 }
 
 // MARK: - APIServicing
-protocol APIServicing {
+public protocol APIServicing: Sendable {
     func fetchUsers(page: Int, results: Int, seed: String?) async throws -> RandomUserResponse
-    
-    // Generic request for future scalability
-    @discardableResult
-    func request<T: Decodable>(
-        _ type: T.Type,
-        path: String,
-        method: HTTPMethod,
-        urlParameters: [String: String]?,
-        headers: [String: String]?,
-        body: Data?
-    ) async throws -> T
 }
 
 // MARK: - Endpoint
@@ -85,7 +75,7 @@ private struct Endpoint {
 }
 
 // MARK: - APIService
-final class APIService: APIServicing {
+public final class APIService: APIServicing {
     private let baseURL: URL
     private let session: URLSession
     private let decoder: JSONDecoder
@@ -93,7 +83,7 @@ final class APIService: APIServicing {
     private let defaultCachePolicy: URLRequest.CachePolicy
     private let requestTimeout: TimeInterval
     
-    init(
+    public init(
         baseURL: URL = URL(string: "https://randomuser.me")!,
         session: URLSession = {
             let configuration = URLSessionConfiguration.default
@@ -119,9 +109,9 @@ final class APIService: APIServicing {
         self.requestTimeout = requestTimeout
     }
     
-    // MARK: - Public generic request
+    // MARK: - Internal generic request
     @discardableResult
-    func request<T: Decodable>(
+    internal func request<T: Decodable>(
         _ type: T.Type,
         path: String,
         method: HTTPMethod = .GET,
@@ -181,7 +171,7 @@ final class APIService: APIServicing {
     }
     
     // MARK: - Fetch Users
-    func fetchUsers(page: Int, results: Int = 25, seed: String? = nil) async throws -> RandomUserResponse {
+    public func fetchUsers(page: Int, results: Int = 25, seed: String? = nil) async throws -> RandomUserResponse {
         var params: [String: String] = [
             "results": "\(results)",
             "page": "\(page)"
@@ -190,7 +180,6 @@ final class APIService: APIServicing {
             params["seed"] = seed
         }
         
-        // randomuser path
         return try await request(
             RandomUserResponse.self,
             path: "/api/",

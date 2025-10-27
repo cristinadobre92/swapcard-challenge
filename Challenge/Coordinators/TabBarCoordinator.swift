@@ -1,4 +1,7 @@
 import UIKit
+import APIServiceKit
+import BookmarksKit
+import DesignKit
 
 class TabBarCoordinator: NSObject, Coordinator {
     var navigationController: UINavigationController
@@ -8,12 +11,14 @@ class TabBarCoordinator: NSObject, Coordinator {
     private var bookmarksCoordinator: BookmarksCoordinator?
     
     private let bookmarkManager: BookmarkManaging
+    private let imageLoader: ImageLoading
     private let apiService: APIServicing
     
-    init(bookmarkManager: BookmarkManaging, apiService: APIServicing) {
+    init(bookmarkManager: BookmarkManaging, imageLoader: ImageLoading, apiService: APIServicing) {
         self.navigationController = UINavigationController()
         self.tabBarController = UITabBarController()
         self.bookmarkManager = bookmarkManager
+        self.imageLoader = imageLoader
         self.apiService = apiService
     }
     
@@ -43,7 +48,8 @@ class TabBarCoordinator: NSObject, Coordinator {
         usersListCoordinator = UsersListCoordinator(
             navigationController: usersListNavController,
             bookmarkManager: bookmarkManager,
-            apiService: apiService
+            apiService: apiService,
+            imageLoader: imageLoader
         )
 
         usersListNavController.tabBarItem = UITabBarItem(
@@ -56,7 +62,8 @@ class TabBarCoordinator: NSObject, Coordinator {
         let bookmarksNavController = UINavigationController()
         bookmarksCoordinator = BookmarksCoordinator(
             navigationController: bookmarksNavController,
-            bookmarkManager: bookmarkManager
+            bookmarkManager: bookmarkManager,
+            imageLoader: imageLoader
         )
         
         bookmarksNavController.tabBarItem = UITabBarItem(

@@ -1,5 +1,8 @@
 import Foundation
 import UIKit
+import SharedModelsKit
+import BookmarksKit
+import DesignKit
 
 protocol UserDetailViewModelDelegate: AnyObject {
     func didUpdateBookmarkStatus()
@@ -13,13 +16,14 @@ class UserDetailViewModel {
     weak var delegate: UserDetailViewModelDelegate?
     
     private(set) var user: User
-    private let imageLoadingService = ImageLoadingService.shared
+    private let imageLoader: ImageLoading
     private let bookmarkManager: BookmarkManaging
     
     // MARK: - Initialization
-    init(user: User, bookmarkManager: BookmarkManaging) {
+    init(user: User, bookmarkManager: BookmarkManaging, imageLoader: ImageLoading) {
         self.user = user
         self.bookmarkManager = bookmarkManager
+        self.imageLoader = imageLoader
         setupNotifications()
     }
     
@@ -65,7 +69,7 @@ class UserDetailViewModel {
     func loadProfileImage() {
         Task { [weak self] in
             guard let self else { return }
-            if let image = await imageLoadingService.loadImage(from: user.picture.large) {
+            if let image = await imageLoader.loadImage(from: user.picture.large) {
                 delegate?.didLoadProfileImage(image)
             }
         }

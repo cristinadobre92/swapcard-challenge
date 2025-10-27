@@ -1,24 +1,32 @@
 import Foundation
 import UIKit
 
+// Abstraction for dependency injection
+public protocol ImageLoading {
+    func loadImage(from urlString: String) async -> UIImage?
+}
+
 // MARK: - Image Loading Service
-final class ImageLoadingService {
-    static let shared = ImageLoadingService()
+public final class ImageLoadingService: ImageLoading {
 
     private let cache = NSCache<NSString, UIImage>()
     private let session: URLSession
 
-    private init() {
+    public init(session: URLSession? = nil) {
         cache.countLimit = 100
         cache.totalCostLimit = 1024 * 1024 * 100 // 100 MB
 
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        self.session = URLSession(configuration: configuration)
+        if let session {
+            self.session = session
+        } else {
+            let configuration = URLSessionConfiguration.default
+            configuration.timeoutIntervalForRequest = 30
+            self.session = URLSession(configuration: configuration)
+        }
     }
 
     // Async/await image loading with in-memory cache
-    func loadImage(from urlString: String) async -> UIImage? {
+    public func loadImage(from urlString: String) async -> UIImage? {
         let cacheKey = NSString(string: urlString)
 
         // Return cached image if available

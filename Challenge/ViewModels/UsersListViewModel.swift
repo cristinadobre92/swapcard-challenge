@@ -1,4 +1,7 @@
 import Foundation
+import APIServiceKit
+import SharedModelsKit
+import BookmarksKit
 
 protocol UsersListViewModelDelegate: AnyObject {
     func didUpdateUsers()
