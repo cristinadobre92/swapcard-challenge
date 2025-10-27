@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6519B6892EAE2A350059E4DD /* BookmarksKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6519B6882EAE2A350059E4DD /* BookmarksKit */; };
+		6519B68D2EAE71FD0059E4DD /* DesignKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6519B68C2EAE71FD0059E4DD /* DesignKit */; };
 		655086272EAD3AD900D63478 /* BookmarkFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 655086262EAD3AD900D63478 /* BookmarkFeature */; };
 		655086292EAD3AD900D63478 /* UserDetailFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 655086282EAD3AD900D63478 /* UserDetailFeature */; };
 		6550862B2EAD3AD900D63478 /* UsersListFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 6550862A2EAD3AD900D63478 /* UsersListFeature */; };
@@ -46,6 +47,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6550865C2EAD40E100D63478 /* SharedModelsKit in Frameworks */,
+				6519B68D2EAE71FD0059E4DD /* DesignKit in Frameworks */,
 				655086272EAD3AD900D63478 /* BookmarkFeature in Frameworks */,
 				6550865A2EAD40E100D63478 /* APIServiceKit in Frameworks */,
 				6519B6892EAE2A350059E4DD /* BookmarksKit in Frameworks */,
@@ -108,6 +110,7 @@
 				655086592EAD40E100D63478 /* APIServiceKit */,
 				6550865B2EAD40E100D63478 /* SharedModelsKit */,
 				6519B6882EAE2A350059E4DD /* BookmarksKit */,
+				6519B68C2EAE71FD0059E4DD /* DesignKit */,
 			);
 			productName = Challenge;
 			productReference = ED36A9CF2E9FF45D00D355C1 /* Challenge.app */;
@@ -366,6 +369,10 @@
 		6519B6882EAE2A350059E4DD /* BookmarksKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BookmarksKit;
+		};
+		6519B68C2EAE71FD0059E4DD /* DesignKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignKit;
 		};
 		655086262EAD3AD900D63478 /* BookmarkFeature */ = {
 			isa = XCSwiftPackageProductDependency;

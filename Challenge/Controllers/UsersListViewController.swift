@@ -2,6 +2,7 @@ import UIKit
 import APIServiceKit
 import SharedModelsKit
 import BookmarksKit
+import DesignKit
 
 class UsersListViewController: UIViewController {
     
@@ -9,6 +10,7 @@ class UsersListViewController: UIViewController {
     weak var coordinator: UsersListCoordinator?
     private var viewModel: UsersListViewModel
     private let bookmarkManager: BookmarkManaging
+    private let imageLoader: ImageLoading
     
     // MARK: - UI Elements
     private let tableView: UITableView = {
@@ -58,8 +60,13 @@ class UsersListViewController: UIViewController {
     }()
     
     // MARK: - Init
-    init(bookmarkManager: BookmarkManaging, apiService: APIServicing) {
+    init(
+        bookmarkManager: BookmarkManaging,
+        apiService: APIServicing,
+        imageLoader: ImageLoading
+    ) {
         self.bookmarkManager = bookmarkManager
+        self.imageLoader = imageLoader
         self.viewModel = UsersListViewModel(bookmarkManager: bookmarkManager, apiService: apiService)
         super.init(nibName: nil, bundle: nil)
     }
@@ -181,7 +188,12 @@ class UsersListViewController: UIViewController {
                   let indexPath = tableView.indexPath(for: cell),
                   let user = viewModel.user(at: indexPath.row) else { continue }
             
-            userCell.configure(with: user, bookmarkManager: bookmarkManager)
+            userCell
+                .configure(
+                    with: user,
+                    bookmarkManager: bookmarkManager,
+                    imageLoader: imageLoader
+                )
         }
     }
     
@@ -215,7 +227,12 @@ extension UsersListViewController: UITableViewDataSource {
         }
         
         if let user = viewModel.user(at: indexPath.row) {
-            cell.configure(with: user, bookmarkManager: bookmarkManager)
+            cell
+                .configure(
+                    with: user,
+                    bookmarkManager: bookmarkManager,
+                    imageLoader: imageLoader
+                )
             cell.delegate = self
         }
         

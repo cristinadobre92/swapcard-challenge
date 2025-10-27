@@ -27,7 +27,7 @@ extension UIView {
 extension UIViewController {
     
     /// Show a simple alert with title and message
-    func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+    public func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
             completion?()
@@ -36,7 +36,7 @@ extension UIViewController {
     }
     
     /// Show an alert with custom actions
-    func showActionSheet(title: String?, message: String?, actions: [UIAlertAction], sourceView: UIView? = nil) {
+    public func showActionSheet(title: String?, message: String?, actions: [UIAlertAction], sourceView: UIView? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
         
         actions.forEach { alert.addAction($0) }
@@ -79,7 +79,7 @@ extension String {
 extension UIImage {
     
     /// Create a placeholder image with initials
-    static func placeholder(initials: String, size: CGSize = CGSize(width: 100, height: 100), backgroundColor: UIColor = .systemBlue, textColor: UIColor = .white) -> UIImage? {
+    public static func placeholder(initials: String, size: CGSize = CGSize(width: 100, height: 100), backgroundColor: UIColor = .systemBlue, textColor: UIColor = .white) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: size)
         
         return renderer.image { context in

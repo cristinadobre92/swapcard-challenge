@@ -1,6 +1,7 @@
 import UIKit
 import SharedModelsKit
 import BookmarksKit
+import DesignKit
 
 protocol UserDetailCoordinatorDelegate: AnyObject {
     func userDetailCoordinatorDidFinish(_ coordinator: UserDetailCoordinator)
@@ -11,12 +12,14 @@ class UserDetailCoordinator: Coordinator {
     var navigationController: UINavigationController
     
     private let bookmarkManager: BookmarkManaging
+    private let imageLoader: ImageLoading
     private let user: User
     
-    init(navigationController: UINavigationController, user: User, bookmarkManager: BookmarkManaging) {
+    init(navigationController: UINavigationController, user: User, bookmarkManager: BookmarkManaging, imageLoader: ImageLoading) {
         self.navigationController = navigationController
         self.user = user
         self.bookmarkManager = bookmarkManager
+        self.imageLoader = imageLoader
     }
     
     func start() {
@@ -26,7 +29,8 @@ class UserDetailCoordinator: Coordinator {
     private func showUserDetail() {
         let userDetailVC = UserDetailViewController(
             user: user,
-            bookmarkManager: bookmarkManager
+            bookmarkManager: bookmarkManager,
+            imageLoading: imageLoader
         )
         userDetailVC.coordinator = self
         navigationController.pushViewController(userDetailVC, animated: true)

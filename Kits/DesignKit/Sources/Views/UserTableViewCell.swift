@@ -2,17 +2,18 @@ import UIKit
 import SharedModelsKit
 import BookmarksKit
 
-protocol UserTableViewCellDelegate: AnyObject {
+public protocol UserTableViewCellDelegate: AnyObject {
     func didTapBookmark(for user: User)
 }
 
-class UserTableViewCell: UITableViewCell {
-    static let identifier = "UserTableViewCell"
+public final class UserTableViewCell: UITableViewCell {
+    public static let identifier = "UserTableViewCell"
     
-    weak var delegate: UserTableViewCellDelegate?
+    public weak var delegate: UserTableViewCellDelegate?
     private var user: User?
     private var avatarLoadTask: Task<Void, Never>?
     private var bookmarkManager: BookmarkManaging?
+    private var imageLoading: ImageLoading?
     
     // MARK: - UI Elements
     private let avatarImageView: UIImageView = {
@@ -138,6 +139,12 @@ class UserTableViewCell: UITableViewCell {
         loadAvatar(from: user.picture.thumbnail)
     }
     
+    // Overload used by callers that also pass an image loader
+    public func configure(with user: User, bookmarkManager: BookmarkManaging, imageLoader: ImageLoading) {
+        self.imageLoading = imageLoader
+        configure(with: user, bookmarkManager: bookmarkManager)
+    }
+    
     private func loadAvatar(from urlString: String) {
         avatarLoadTask?.cancel()
         
@@ -151,12 +158,18 @@ class UserTableViewCell: UITableViewCell {
             avatarImageView.image = UIImage(systemName: "person.circle.fill")
         }
         
+        // Capture the loader in a local constant to avoid capturing self inside the Task.
+        let loader = self.imageLoading
+        
         avatarLoadTask = Task { [weak self] in
             guard let self else { return }
-            if let image = await ImageLoadingService.shared.loadImage(from: urlString) {
-                // Ensure cell hasn't been reused for a different user
+            // Use the captured loader; ImageLoading is Sendable so this is safe.
+            if let image = await loader?.loadImage(from: urlString) {
                 if !Task.isCancelled {
-                    self.avatarImageView.image = image
+                    // hop to main actor to touch UI (Task may not be on main)
+                    await MainActor.run {
+                        self.avatarImageView.image = image
+                    }
                 }
             }
         }
@@ -166,14 +179,12 @@ class UserTableViewCell: UITableViewCell {
         guard let user = user else { return }
         delegate?.didTapBookmark(for: user)
         
-        // Update button state immediately for better UX
         if let bookmarkManager {
             bookmarkButton.isSelected = bookmarkManager.isBookmarked(user)
         } else {
             bookmarkButton.isSelected = false
         }
         
-        // Add a little animation
         UIView.animate(withDuration: 0.1, animations: {
             self.bookmarkButton.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
         }) { _ in
@@ -183,7 +194,7 @@ class UserTableViewCell: UITableViewCell {
         }
     }
     
-    override func prepareForReuse() {
+    override public func prepareForReuse() {
         super.prepareForReuse()
         avatarLoadTask?.cancel()
         avatarLoadTask = nil
@@ -202,5 +213,6 @@ class UserTableViewCell: UITableViewCell {
         bookmarkButton.isSelected = false
         user = nil
         bookmarkManager = nil
+        imageLoading = nil
     }
 }

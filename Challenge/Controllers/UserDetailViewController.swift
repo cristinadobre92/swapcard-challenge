@@ -1,6 +1,7 @@
 import UIKit
 import SharedModelsKit
 import BookmarksKit
+import DesignKit
 
 class UserDetailViewController: UIViewController {
     
@@ -69,8 +70,16 @@ class UserDetailViewController: UIViewController {
     }()
     
     // MARK: - Initialization
-    init(user: User, bookmarkManager: BookmarkManaging) {
-        self.viewModel = UserDetailViewModel(user: user, bookmarkManager: bookmarkManager)
+    init(
+        user: User,
+        bookmarkManager: BookmarkManaging,
+        imageLoading: ImageLoading
+    ) {
+        self.viewModel = UserDetailViewModel(
+            user: user,
+            bookmarkManager: bookmarkManager,
+            imageLoader: imageLoading
+        )
         super.init(nibName: nil, bundle: nil)
     }
     

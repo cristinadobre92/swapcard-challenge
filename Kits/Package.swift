@@ -9,7 +9,8 @@ let package = Package(
     products: [
         .singleTargetLibrary("APIServiceKit"),
         .singleTargetLibrary("BookmarksKit"),
-        .singleTargetLibrary("SharedModelsKit")
+        .singleTargetLibrary("SharedModelsKit"),
+        .singleTargetLibrary("DesignKit")
     ],
     targets: [
         .projectTarget(
@@ -27,6 +28,13 @@ let package = Package(
         .projectTarget(
             name: "SharedModelsKit",
             dependencies: []
+        ),
+        .projectTarget(
+            name: "DesignKit",
+            dependencies: [
+                "SharedModelsKit",
+                "BookmarksKit"
+            ]
         )
     ]
 )
