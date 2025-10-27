@@ -14,15 +14,13 @@ class AppCoordinator: Coordinator {
     
     func start() {
         // Create dependencies
-        let bookmarkManager: BookmarkManaging = BookmarkManager()
-        let apiService: APIServicing = APIService()
-        let imageLoader: ImageLoading = ImageLoadingService()
+        let deps = makeDependencies()
         
         // Inject into the TabBarCoordinator
         tabBarCoordinator = TabBarCoordinator(
-            bookmarkManager: bookmarkManager,
-            imageLoader: imageLoader,
-            apiService: apiService
+            bookmarkManager: deps.bookmarkManager,
+            imageLoader: deps.imageLoader,
+            apiService: deps.apiService
         )
         
         window.rootViewController = tabBarCoordinator.tabBarController
@@ -32,3 +30,23 @@ class AppCoordinator: Coordinator {
     }
 }
 
+private extension AppCoordinator {
+    struct Dependencies {
+        let bookmarkManager: BookmarkManaging
+        let apiService: APIServicing
+        let imageLoader: ImageLoading
+    }
+    
+    func makeDependencies() -> Dependencies {
+        let bookmarkManager: BookmarkManaging = BookmarkManager()
+        let apiConfig = APIServiceConfiguration.defaultConfig()
+        let apiService: APIServicing = APIService(configuration: apiConfig)
+        let imageLoader: ImageLoading = ImageLoadingService()
+        
+        return Dependencies(
+            bookmarkManager: bookmarkManager,
+            apiService: apiService,
+            imageLoader: imageLoader
+        )
+    }
+}

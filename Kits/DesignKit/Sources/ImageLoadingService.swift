@@ -1,7 +1,6 @@
 import Foundation
 import UIKit
 
-// Abstraction for dependency injection
 public protocol ImageLoading {
     func loadImage(from urlString: String) async -> UIImage?
 }
@@ -13,19 +12,23 @@ public final class ImageLoadingService: ImageLoading {
     private let session: URLSession
 
     public init(session: URLSession? = nil) {
+        self.session = ImageLoadingService.configure(cache: cache, with: session)
+    }
+
+    // Configures cache limits and returns the URLSession to use
+    private static func configure(cache: NSCache<NSString, UIImage>, with providedSession: URLSession?) -> URLSession {
         cache.countLimit = 100
         cache.totalCostLimit = 1024 * 1024 * 100 // 100 MB
 
-        if let session {
-            self.session = session
+        if let providedSession {
+            return providedSession
         } else {
             let configuration = URLSessionConfiguration.default
             configuration.timeoutIntervalForRequest = 30
-            self.session = URLSession(configuration: configuration)
+            return URLSession(configuration: configuration)
         }
     }
 
-    // Async/await image loading with in-memory cache
     public func loadImage(from urlString: String) async -> UIImage? {
         let cacheKey = NSString(string: urlString)
 
