@@ -4,6 +4,7 @@ import SharedModelsKit
 import BookmarksKit
 import DesignKit
 
+@MainActor
 protocol UserDetailViewModelDelegate: AnyObject {
     func didUpdateBookmarkStatus()
     func didLoadProfileImage(_ image: UIImage)

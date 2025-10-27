@@ -2,11 +2,13 @@ import Foundation
 import SharedModelsKit
 import BookmarksKit
 
+@MainActor
 protocol BookmarksViewModelDelegate: AnyObject {
     func didUpdateBookmarks()
     func didReceiveError(_ message: String)
 }
 
+@MainActor
 class BookmarksViewModel {
     
     // MARK: - Properties

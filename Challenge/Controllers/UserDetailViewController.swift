@@ -358,16 +358,14 @@ class UserDetailViewController: UIViewController {
 }
 
 // MARK: - UserDetailViewModelDelegate
+@MainActor
 extension UserDetailViewController: UserDetailViewModelDelegate {
     func didUpdateBookmarkStatus() {
-        DispatchQueue.main.async {
-            self.updateBookmarkButton()
-        }
+        self.updateBookmarkButton()
     }
     
     func didLoadProfileImage(_ image: UIImage) {
-        DispatchQueue.main.async {
-            self.profileImageView.image = image
-        }
+        self.profileImageView.image = image
     }
 }
+

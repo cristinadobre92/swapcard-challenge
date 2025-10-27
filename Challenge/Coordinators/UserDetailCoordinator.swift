@@ -3,10 +3,12 @@ import SharedModelsKit
 import BookmarksKit
 import DesignKit
 
+@MainActor
 protocol UserDetailCoordinatorDelegate: AnyObject {
     func userDetailCoordinatorDidFinish(_ coordinator: UserDetailCoordinator)
 }
 
+@MainActor
 class UserDetailCoordinator: Coordinator {
     weak var delegate: UserDetailCoordinatorDelegate?
     var navigationController: UINavigationController

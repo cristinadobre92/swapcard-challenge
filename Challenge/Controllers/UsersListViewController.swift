@@ -176,10 +176,8 @@ class UsersListViewController: UIViewController {
     }
     
     @objc private func bookmarkDidChange(_ notification: Notification) {
-        DispatchQueue.main.async {
-            // Update visible cells to reflect bookmark changes
-            self.updateVisibleCells()
-        }
+        // Update visible cells to reflect bookmark changes
+        updateVisibleCells()
     }
     
     private func updateVisibleCells() {
@@ -199,14 +197,12 @@ class UsersListViewController: UIViewController {
     
     // MARK: - UI Updates
     private func updateUI() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-            self.emptyStateView.isHidden = !self.viewModel.isEmpty
-            
-            let emptyState = self.viewModel.getEmptyStateMessage()
-            self.emptyStateLabel.text = emptyState.title
-            self.emptyStateSubLabel.text = emptyState.subtitle
-        }
+        tableView.reloadData()
+        emptyStateView.isHidden = !viewModel.isEmpty
+        
+        let emptyState = viewModel.getEmptyStateMessage()
+        emptyStateLabel.text = emptyState.title
+        emptyStateSubLabel.text = emptyState.subtitle
     }
     
     // MARK: - Navigation
@@ -274,6 +270,7 @@ extension UsersListViewController: UserTableViewCellDelegate {
 }
 
 // MARK: - UsersListViewModelDelegate
+@MainActor
 extension UsersListViewController: UsersListViewModelDelegate {
     func didUpdateUsers() {
         updateUI()
@@ -284,35 +281,30 @@ extension UsersListViewController: UsersListViewModelDelegate {
     }
     
     func didReceiveError(_ error: NetworkError) {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(
-                title: "Error",
-                message: error.localizedDescription,
-                preferredStyle: .alert
-            )
-            
-            alert.addAction(UIAlertAction(title: "Retry", style: .default) { _ in
-                self.viewModel.loadUsers()
-            })
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-            
-            self.present(alert, animated: true)
-        }
+        let alert = UIAlertController(
+            title: "Error",
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "Retry", style: .default) { _ in
+            self.viewModel.loadUsers()
+        })
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        
+        self.present(alert, animated: true)
     }
     
     func didStartLoading() {
-        DispatchQueue.main.async {
-            if self.viewModel.shouldShowInitialLoading() {
-                self.loadingIndicator.startAnimating()
-            }
+        if self.viewModel.shouldShowInitialLoading() {
+            self.loadingIndicator.startAnimating()
         }
     }
     
     func didFinishLoading() {
-        DispatchQueue.main.async {
-            self.loadingIndicator.stopAnimating()
-            self.refreshControl.endRefreshing()
-        }
+        self.loadingIndicator.stopAnimating()
+        self.refreshControl.endRefreshing()
     }
 }
+
